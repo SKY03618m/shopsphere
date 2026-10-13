@@ -192,30 +192,38 @@ curl http://localhost:5000/api/health
 
 ### 4. Kubernetes Deployment on Minikube
 
-#### Start Minikube:
-```bash
-minikube start
-```
+### Kubernetes Configuration Details
 
-#### Apply Kubernetes Manifests:
-```bash
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-```
+The Kubernetes manifests are located in the `k8s/` directory.
 
-#### Check Deployment & Pods Status:
-```bash
-kubectl get deployments
-kubectl get pods -l app=shopsphere
-kubectl get svc shopsphere-service
-```
+**Deployment (`deployment.yaml`)**
+- Deployment name: `shopsphere-deployment`
+- Replicas: 2
+- Container image: `shopsphere:1.0`
+- Container port: `5000`
+- Image pull policy: `IfNotPresent`
+- Resource requests per pod: 128 MiB memory and 100m CPU.
+- Resource limits per pod: 256 MiB memory and 250m CPU.
+- Readiness and liveness probes check `/api/health` on port 5000.
+- Environment variables are loaded from `shopsphere-config`.
 
-#### Access via Minikube Service URL:
-```bash
-minikube service shopsphere-service --url
-```
-Or browse to `http://<minikube-ip>:30080`.
+**Service (`service.yaml`)**
+- Service name: `shopsphere-service`
+- Type: `NodePort`
+- Service port: `5000`
+- Target port: `5000`
+- NodePort: `30080`
+- Selects application pods using the label `app: shopsphere`.
+
+**ConfigMap (`configmap.yaml`)**
+
+The `shopsphere-config` ConfigMap defines these environment variables:
+
+| Variable | Value |
+|---|---|
+| `PORT` | `5000` |
+| `FLASK_ENV` | `production` |
+| `DATABASE_PATH` | `/app/instance/shopsphere.db` |
 
 ---
 
@@ -298,29 +306,5 @@ ShopSphere uses SQLite for database storage and Python's built-in `sqlite3` modu
 
 The `app/db.py` file manages database connections using the `get_db()` function. It stores the connection in Flask's `g` object, enables row-based access with `sqlite3.Row`, and enforces foreign key constraints.
 
-The `close_db()` function closes the database connection when the application context ends.
+    docker run -p 5000:5000 shopsphere:1.0
 
-### Database Schema
-
-The `init_db()` function reads and executes the SQL statements from `app/schema.sql` to initialize the database tables.
-
-### Seed Data
-
-The `app/seed_data.py` file defines sample categories and products using `SAMPLE_CATEGORIES` and `SAMPLE_PRODUCTS`.
-
-The initial data includes four product categories:
-
-- Electronics
-- Fashion
-- Home & Kitchen
-- Books & Tech
-
-The sample dataset contains 13 products with details such as category, name, slug, description, price, stock quantity, and image URL.
-
-The `seed_db()` function inserts the initial categories and products when the categories table is empty. If categories already exist, it updates existing products' prices and descriptions using their slugs.
-
-### Database Initialization Command
-
-The `init-db` Flask CLI command initializes the schema and seeds the database. The database setup is also checked during application initialization; if the `products` table does not exist, the application attempts to initialize and seed the database automatically.
-
-Refer to `app/db.py`, `app/schema.sql`, and `app/seed_data.py` for implementation details.
