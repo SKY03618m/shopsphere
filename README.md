@@ -289,3 +289,13 @@ The team uses Git and GitHub to manage project changes.
 5. Push the branch to GitHub.
 6. Create a Pull Request targeting main.
 7. Review and merge the Pull Request.
+
+## Docker
+
+Build the Docker image:
+
+    docker build -t shopsphere:1.0 .
+
+Run the container:
+
+    docker run -p 5000:5000 shopsphere:1.0
