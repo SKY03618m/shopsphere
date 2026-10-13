@@ -290,12 +290,37 @@ The team uses Git and GitHub to manage project changes.
 6. Create a Pull Request targeting main.
 7. Review and merge the Pull Request.
 
-## Docker
+## Database Initialization
 
-Build the Docker image:
+ShopSphere uses SQLite for database storage and Python's built-in `sqlite3` module to manage database connections. The database path is configured through the Flask application's configuration.
 
-    docker build -t shopsphere:1.0 .
+### Database Connection
 
-Run the container:
+The `app/db.py` file manages database connections using the `get_db()` function. It stores the connection in Flask's `g` object, enables row-based access with `sqlite3.Row`, and enforces foreign key constraints.
 
-    docker run -p 5000:5000 shopsphere:1.0
+The `close_db()` function closes the database connection when the application context ends.
+
+### Database Schema
+
+The `init_db()` function reads and executes the SQL statements from `app/schema.sql` to initialize the database tables.
+
+### Seed Data
+
+The `app/seed_data.py` file defines sample categories and products using `SAMPLE_CATEGORIES` and `SAMPLE_PRODUCTS`.
+
+The initial data includes four product categories:
+
+- Electronics
+- Fashion
+- Home & Kitchen
+- Books & Tech
+
+The sample dataset contains 13 products with details such as category, name, slug, description, price, stock quantity, and image URL.
+
+The `seed_db()` function inserts the initial categories and products when the categories table is empty. If categories already exist, it updates existing products' prices and descriptions using their slugs.
+
+### Database Initialization Command
+
+The `init-db` Flask CLI command initializes the schema and seeds the database. The database setup is also checked during application initialization; if the `products` table does not exist, the application attempts to initialize and seed the database automatically.
+
+Refer to `app/db.py`, `app/schema.sql`, and `app/seed_data.py` for implementation details.
