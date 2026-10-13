@@ -278,3 +278,14 @@ git add .
 git commit -m "feat: implement <module_name>"
 git push origin main
 ```
+## Git Collaboration Workflow
+
+The team uses Git and GitHub to manage project changes.
+
+1. Clone the repository.
+2. Create an individual feature branch.
+3. Make the assigned change.
+4. Commit the changes.
+5. Push the branch to GitHub.
+6. Create a Pull Request targeting main.
+7. Review and merge the Pull Request.
