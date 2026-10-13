@@ -192,30 +192,38 @@ curl http://localhost:5000/api/health
 
 ### 4. Kubernetes Deployment on Minikube
 
-#### Start Minikube:
-```bash
-minikube start
-```
+### Kubernetes Configuration Details
 
-#### Apply Kubernetes Manifests:
-```bash
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-```
+The Kubernetes manifests are located in the `k8s/` directory.
 
-#### Check Deployment & Pods Status:
-```bash
-kubectl get deployments
-kubectl get pods -l app=shopsphere
-kubectl get svc shopsphere-service
-```
+**Deployment (`deployment.yaml`)**
+- Deployment name: `shopsphere-deployment`
+- Replicas: 2
+- Container image: `shopsphere:1.0`
+- Container port: `5000`
+- Image pull policy: `IfNotPresent`
+- Resource requests per pod: 128 MiB memory and 100m CPU.
+- Resource limits per pod: 256 MiB memory and 250m CPU.
+- Readiness and liveness probes check `/api/health` on port 5000.
+- Environment variables are loaded from `shopsphere-config`.
 
-#### Access via Minikube Service URL:
-```bash
-minikube service shopsphere-service --url
-```
-Or browse to `http://<minikube-ip>:30080`.
+**Service (`service.yaml`)**
+- Service name: `shopsphere-service`
+- Type: `NodePort`
+- Service port: `5000`
+- Target port: `5000`
+- NodePort: `30080`
+- Selects application pods using the label `app: shopsphere`.
+
+**ConfigMap (`configmap.yaml`)**
+
+The `shopsphere-config` ConfigMap defines these environment variables:
+
+| Variable | Value |
+|---|---|
+| `PORT` | `5000` |
+| `FLASK_ENV` | `production` |
+| `DATABASE_PATH` | `/app/instance/shopsphere.db` |
 
 ---
 
@@ -299,3 +307,4 @@ Build the Docker image:
 Run the container:
 
     docker run -p 5000:5000 shopsphere:1.0
+
