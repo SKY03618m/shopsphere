@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="cart-page-header">
-    <h1 class="cart-title">Shopping Cart</h1>
+    <h1 class="cart-title">Your Shopping Cart</h1>
     <span class="item-count-badge">
         {{ cart.total_items }} item{{ 's' if cart.total_items != 1 else '' }} in your cart
     </span>
@@ -18,16 +18,13 @@
             {% for item in cart.cart_items %}
             <div class="cart-item-row" id="cart-item-{{ item.product.id }}">
                 <div class="cart-item-img-container">
-                    <img 
-                        src="{{ item.product.image_url }}" 
-                        alt="{{ item.product.name }}" 
-                        class="cart-item-img"
-                        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'10\' fill=\'%2364748b\'>Product</text></svg>';"
-                    >
+                    <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="cart-item-img"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'10\' fill=\'%2364748b\'>Product</text></svg>';">
                 </div>
 
                 <div class="cart-item-details">
-                    <span class="product-category-tag" style="position: static; display: inline-block; margin-bottom: 0.25rem;">
+                    <span class="product-category-tag"
+                        style="position: static; display: inline-block; margin-bottom: 0.25rem;">
                         {{ item.product.category_name }}
                     </span>
                     <h3 class="cart-item-title">
@@ -41,21 +38,17 @@
 
                     <!-- Quantity update form -->
                     <div class="cart-item-actions">
-                        <form action="{{ url_for('cart.update_cart', product_id=item.product.id) }}" method="POST" class="cart-qty-form">
+                        <form action="{{ url_for('cart.update_cart', product_id=item.product.id) }}" method="POST"
+                            class="cart-qty-form">
                             <label for="qty-{{ item.product.id }}" class="qty-mini-label">Qty:</label>
-                            <input 
-                                type="number" 
-                                id="qty-{{ item.product.id }}" 
-                                name="quantity" 
-                                value="{{ item.quantity }}" 
-                                min="1" 
-                                max="{{ item.product.stock }}" 
-                                class="cart-qty-input"
-                            >
+                            <input type="number" id="qty-{{ item.product.id }}" name="quantity"
+                                value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}"
+                                class="cart-qty-input">
                             <button type="submit" class="btn-update-qty">Update</button>
                         </form>
 
-                        <form action="{{ url_for('cart.remove_from_cart', product_id=item.product.id) }}" method="POST" style="margin: 0;">
+                        <form action="{{ url_for('cart.remove_from_cart', product_id=item.product.id) }}" method="POST"
+                            style="margin: 0;">
                             <button type="submit" class="btn-remove-item">
                                 Remove
                             </button>
@@ -74,7 +67,8 @@
                 <a href="{{ url_for('catalog.index') }}" class="btn-continue-shopping">
                     &larr; Continue Shopping
                 </a>
-                <form action="{{ url_for('cart.clear_cart') }}" method="POST" onsubmit="return confirm('Clear entire shopping cart?');">
+                <form action="{{ url_for('cart.clear_cart') }}" method="POST"
+                    onsubmit="return confirm('Clear entire shopping cart?');">
                     <button type="submit" class="btn-clear-cart">Clear Cart</button>
                 </form>
             </div>
@@ -95,9 +89,9 @@
                 <span>Standard Delivery</span>
                 <span>
                     {% if cart.shipping == 0.0 %}
-                        <strong style="color: var(--success);">FREE</strong>
+                    <strong style="color: var(--success);">FREE</strong>
                     {% else %}
-                        {{ cart.shipping|inr }}
+                    {{ cart.shipping|inr }}
                     {% endif %}
                 </span>
             </div>
@@ -149,7 +143,8 @@
         </svg>
     </div>
     <h2>Your Shopping Cart is Empty</h2>
-    <p>Looks like you haven't added anything to your cart yet. Explore our curated categories and find great essentials.</p>
+    <p>Looks like you haven't added anything to your cart yet. Explore our curated categories and find great essentials.
+    </p>
     <a href="{{ url_for('catalog.index') }}" class="btn-primary">
         Start Shopping Now
     </a>

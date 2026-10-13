@@ -298,13 +298,13 @@ The team uses Git and GitHub to manage project changes.
 6. Create a Pull Request targeting main.
 7. Review and merge the Pull Request.
 
-## Docker
+## Database Initialization
 
-Build the Docker image:
+ShopSphere uses SQLite for database storage and Python's built-in `sqlite3` module to manage database connections. The database path is configured through the Flask application's configuration.
 
-    docker build -t shopsphere:1.0 .
+### Database Connection
 
-Run the container:
+The `app/db.py` file manages database connections using the `get_db()` function. It stores the connection in Flask's `g` object, enables row-based access with `sqlite3.Row`, and enforces foreign key constraints.
 
     docker run -p 5000:5000 shopsphere:1.0
 
