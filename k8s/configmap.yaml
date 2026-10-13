@@ -1,0 +1,13 @@
+# ==============================================================================
+# Kubernetes ConfigMap for ShopSphere
+# ==============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shopsphere-config
+  labels:
+    app: shopsphere
+data:
+  PORT: "5000"
+  FLASK_ENV: "production"
+  DATABASE_PATH: "/app/instance/shopsphere.db"

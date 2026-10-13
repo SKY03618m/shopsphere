@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart | ShopSphere India{% endblock %}
+
+{% block content %}
+<div class="cart-page-header">
+    <h1 class="cart-title">Shopping Cart</h1>
+    <span class="item-count-badge">
+        {{ cart.total_items }} item{{ 's' if cart.total_items != 1 else '' }} in your cart
+    </span>
+</div>
+
+{% if cart.cart_items %}
+<div class="cart-grid-layout">
+    <!-- Cart Items Table / List -->
+    <div class="cart-items-wrapper">
+        <div class="cart-items-card">
+            {% for item in cart.cart_items %}
+            <div class="cart-item-row" id="cart-item-{{ item.product.id }}">
+                <div class="cart-item-img-container">
+                    <img 
+                        src="{{ item.product.image_url }}" 
+                        alt="{{ item.product.name }}" 
+                        class="cart-item-img"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23f1f5f9\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'10\' fill=\'%2364748b\'>Product</text></svg>';"
+                    >
+                </div>
+
+                <div class="cart-item-details">
+                    <span class="product-category-tag" style="position: static; display: inline-block; margin-bottom: 0.25rem;">
+                        {{ item.product.category_name }}
+                    </span>
+                    <h3 class="cart-item-title">
+                        <a href="{{ url_for('catalog.product_detail', slug=item.product.slug) }}">
+                            {{ item.product.name }}
+                        </a>
+                    </h3>
+                    <div class="cart-item-unit-price">
+                        Price: <strong>{{ item.product.price|inr }}</strong>
+                    </div>
+
+                    <!-- Quantity update form -->
+                    <div class="cart-item-actions">
+                        <form action="{{ url_for('cart.update_cart', product_id=item.product.id) }}" method="POST" class="cart-qty-form">
+                            <label for="qty-{{ item.product.id }}" class="qty-mini-label">Qty:</label>
+                            <input 
+                                type="number" 
+                                id="qty-{{ item.product.id }}" 
+                                name="quantity" 
+                                value="{{ item.quantity }}" 
+                                min="1" 
+                                max="{{ item.product.stock }}" 
+                                class="cart-qty-input"
+                            >
+                            <button type="submit" class="btn-update-qty">Update</button>
+                        </form>
+
+                        <form action="{{ url_for('cart.remove_from_cart', product_id=item.product.id) }}" method="POST" style="margin: 0;">
+                            <button type="submit" class="btn-remove-item">
+                                Remove
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="cart-item-subtotal">
+                    <div class="subtotal-label">Subtotal</div>
+                    <div class="subtotal-amount">{{ item.subtotal|inr }}</div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="cart-table-footer">
+                <a href="{{ url_for('catalog.index') }}" class="btn-continue-shopping">
+                    &larr; Continue Shopping
+                </a>
+                <form action="{{ url_for('cart.clear_cart') }}" method="POST" onsubmit="return confirm('Clear entire shopping cart?');">
+                    <button type="submit" class="btn-clear-cart">Clear Cart</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary Card -->
+    <div class="cart-summary-wrapper">
+        <div class="summary-card">
+            <h2 class="summary-title">Order Summary</h2>
+
+            <div class="summary-row">
+                <span>Items Subtotal</span>
+                <span>{{ cart.subtotal|inr }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>Standard Delivery</span>
+                <span>
+                    {% if cart.shipping == 0.0 %}
+                        <strong style="color: var(--success);">FREE</strong>
+                    {% else %}
+                        {{ cart.shipping|inr }}
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="summary-row">
+                <span>Estimated GST (5%)</span>
+                <span>{{ cart.tax|inr }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-total-row">
+                <span>Total Amount</span>
+                <span class="total-price">{{ cart.total|inr }}</span>
+            </div>
+
+            {% if cart.shipping > 0 %}
+            <div class="free-shipping-tip">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Add <strong>{{ (999.0 - cart.subtotal)|inr }}</strong> more for FREE delivery!</span>
+            </div>
+            {% endif %}
+
+            <a href="{{ url_for('checkout.checkout') }}" class="btn-checkout-primary" id="btn-proceed-checkout">
+                Proceed to Checkout &rarr;
+            </a>
+
+            <div class="checkout-guarantee">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>Secure Demo Checkout &bull; No Real Payment Taken</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Empty Cart State -->
+<div class="empty-state-box">
+    <div class="empty-state-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+    </div>
+    <h2>Your Shopping Cart is Empty</h2>
+    <p>Looks like you haven't added anything to your cart yet. Explore our curated categories and find great essentials.</p>
+    <a href="{{ url_for('catalog.index') }}" class="btn-primary">
+        Start Shopping Now
+    </a>
+</div>
+{% endif %}
+{% endblock %}

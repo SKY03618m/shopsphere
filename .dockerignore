@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Test files & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+
+# Local databases
+instance/*.db
+*.sqlite3
+
+# Documentation & IDE
+*.md
+.vscode/
+.idea/

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}ShopSphere | Everyday Essentials. Better Choices.{% endblock %}
+
+{% block content %}
+<!-- Compact Shopping Banner (Shown when not actively searching or filtering) -->
+{% if not search_query and not category_slug %}
+<section class="store-banner">
+    <div class="store-banner-text">
+        <span class="banner-tagline">ShopSphere Curated Retail</span>
+        <h1 class="banner-headline">Everyday essentials. Better choices.</h1>
+        <p class="banner-desc">
+            Discover quality electronics, timeless wardrobe staples, and reliable home essentials. Designed for seamless shopping and fast doorstep delivery across India.
+        </p>
+    </div>
+    <div class="banner-meta">
+        <div class="banner-stat">
+            <div class="banner-stat-num">{{ categories|length }}</div>
+            <div class="banner-stat-lbl">Departments</div>
+        </div>
+        <div class="banner-stat">
+            <div class="banner-stat-num">{{ products|length }}</div>
+            <div class="banner-stat-lbl">In-Stock Items</div>
+        </div>
+    </div>
+</section>
+
+<!-- Trust Strip -->
+<div class="trust-strip">
+    <div class="trust-item">
+        <div class="trust-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+        </div>
+        <div>
+            <div class="trust-title">Secure Demo Checkout</div>
+            <div class="trust-desc">Academic simulation &bull; No real cards needed</div>
+        </div>
+    </div>
+
+    <div class="trust-item">
+        <div class="trust-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+        </div>
+        <div>
+            <div class="trust-title">Easy Shopping</div>
+            <div class="trust-desc">Free delivery on orders above ₹999</div>
+        </div>
+    </div>
+
+    <div class="trust-item">
+        <div class="trust-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+        </div>
+        <div>
+            <div class="trust-title">Transparent Pricing</div>
+            <div class="trust-desc">All taxes included &bull; No hidden charges</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Section Title / Search Context -->
+<div class="section-header">
+    <h2 class="section-title">
+        {% if active_category %}
+            {{ active_category.name }}
+        {% elif search_query %}
+            Search Results for "{{ search_query }}"
+        {% else %}
+            Featured Products
+        {% endif %}
+    </h2>
+    <span class="item-count-badge">{{ products|length }} product{{ 's' if products|length != 1 else '' }} available</span>
+</div>
+
+<!-- Active Search / Filter Filter Reset Banner -->
+{% if search_query or category_slug %}
+<div class="filter-status-bar">
+    <span>
+        Showing {{ products|length }} item{{ 's' if products|length != 1 else '' }}
+        {% if search_query %}matching "<strong>{{ search_query }}</strong>"{% endif %}
+        {% if category_slug and active_category %}in <strong>{{ active_category.name }}</strong>{% endif %}
+    </span>
+    <a href="{{ url_for('catalog.index') }}" class="btn-clear-filter">Clear filter &times;</a>
+</div>
+{% endif %}
+
+<!-- Products Grid -->
+{% if products %}
+<div class="products-grid">
+    {% for prod in products %}
+    <div class="product-card" id="product-card-{{ prod.id }}">
+        <a href="{{ url_for('catalog.product_detail', slug=prod.slug) }}" class="product-image-container">
+            <span class="product-category-tag">{{ prod.category_name }}</span>
+            <img 
+                src="{{ prod.image_url }}" 
+                alt="{{ prod.name }}" 
+                class="product-image"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'><rect width=\'400\' height=\'300\' fill=\'%23f1f5f9\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'18\' fill=\'%2364748b\'>{{ prod.name }}</text></svg>';"
+            >
+        </a>
+        <div class="product-info">
+            <h3 class="product-title">
+                <a href="{{ url_for('catalog.product_detail', slug=prod.slug) }}">
+                    {{ prod.name }}
+                </a>
+            </h3>
+            <p class="product-description">{{ prod.description }}</p>
+            <div class="product-footer">
+                <div class="product-price-box">
+                    <span class="product-price">{{ prod.price|inr }}</span>
+                    <span class="tax-badge-mini">incl. taxes</span>
+                </div>
+                <form action="{{ url_for('cart.add_to_cart', product_id=prod.id) }}" method="POST" style="margin: 0;">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn-add-cart" id="btn-add-{{ prod.id }}">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add to Cart
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state-box">
+    <div class="empty-state-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+    </div>
+    <h3>No Products Found</h3>
+    <p>We couldn't find any products matching your search criteria. Try a different search term or browse all items.</p>
+    <a href="{{ url_for('catalog.index') }}" class="btn-primary">Browse All Products</a>
+</div>
+{% endif %}
+{% endblock %}

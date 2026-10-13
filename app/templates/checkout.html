@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | ShopSphere India{% endblock %}
+
+{% block content %}
+<div class="checkout-page-header">
+    <h1 class="cart-title">Checkout</h1>
+    <div class="demo-banner-pill">
+        <span class="pulse-dot"></span>
+        <span>Demo Mode: Simulation Only &bull; No Real Money Charged</span>
+    </div>
+</div>
+
+<div class="checkout-layout">
+    <!-- Checkout Form Column -->
+    <div class="checkout-form-column">
+        <form action="{{ url_for('checkout.checkout') }}" method="POST" class="checkout-form" id="checkout-form">
+            <!-- Step 1: Customer Details -->
+            <div class="form-section-card">
+                <div class="form-section-header">
+                    <div class="step-badge">1</div>
+                    <h2>Delivery Details</h2>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="customer_name" class="form-label">Full Name <span class="required">*</span></label>
+                        <input 
+                            type="text" 
+                            id="customer_name" 
+                            name="customer_name" 
+                            class="form-control" 
+                            placeholder="e.g. Atharv Kothawale"
+                            value="{{ form_data.customer_name if form_data else '' }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_email" class="form-label">Email Address <span class="required">*</span></label>
+                        <input 
+                            type="email" 
+                            id="customer_email" 
+                            name="customer_email" 
+                            class="form-control" 
+                            placeholder="atharv@college.edu"
+                            value="{{ form_data.customer_email if form_data else '' }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_phone" class="form-label">10-Digit Mobile Number <span class="required">*</span></label>
+                        <input 
+                            type="tel" 
+                            id="customer_phone" 
+                            name="customer_phone" 
+                            class="form-control" 
+                            placeholder="9876543210"
+                            value="{{ form_data.customer_phone if form_data else '' }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="shipping_address" class="form-label">Complete Shipping Address <span class="required">*</span></label>
+                        <textarea 
+                            id="shipping_address" 
+                            name="shipping_address" 
+                            class="form-control" 
+                            rows="3" 
+                            placeholder="Flat/House No., Building, Colony/Street, City, State, PIN Code"
+                            required
+                        >{{ form_data.shipping_address if form_data else '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Payment Simulation -->
+            <div class="form-section-card" style="margin-top: 1.5rem;">
+                <div class="form-section-header">
+                    <div class="step-badge">2</div>
+                    <h2>Payment Method (Simulation)</h2>
+                </div>
+
+                <div class="payment-options">
+                    <label class="payment-option-card selected">
+                        <input type="radio" name="payment_method" value="Cash on Delivery" checked>
+                        <div class="payment-option-info">
+                            <strong>Cash on Delivery (Simulated)</strong>
+                            <span>Pay cash or UPI upon delivery of your test shipment.</span>
+                        </div>
+                    </label>
+
+                    <label class="payment-option-card">
+                        <input type="radio" name="payment_method" value="UPI / QR Simulation">
+                        <div class="payment-option-info">
+                            <strong>UPI / Instant QR (Simulated)</strong>
+                            <span>Simulated instant UPI approval for college demo testing.</span>
+                        </div>
+                    </label>
+
+                    <label class="payment-option-card">
+                        <input type="radio" name="payment_method" value="RuPay / NetBanking Simulation">
+                        <div class="payment-option-info">
+                            <strong>RuPay / Debit Card (Simulated)</strong>
+                            <span>Simulated domestic payment gateway verification.</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-checkout-primary" id="btn-submit-order" style="margin-top: 1.5rem; width: 100%; font-size: 1rem; padding: 0.85rem;">
+                Confirm &amp; Place Order ({{ cart.total|inr }}) &rarr;
+            </button>
+        </form>
+    </div>
+
+    <!-- Order Review Summary Column -->
+    <div class="checkout-sidebar-column">
+        <div class="summary-card">
+            <h2 class="summary-title">Order Items ({{ cart.total_items }})</h2>
+
+            <div class="checkout-items-preview">
+                {% for item in cart.cart_items %}
+                <div class="checkout-item-compact">
+                    <img 
+                        src="{{ item.product.image_url }}" 
+                        alt="{{ item.product.name }}" 
+                        class="compact-img"
+                        onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 40 40\'><rect width=\'40\' height=\'40\' fill=\'%23e2e8f0\'/></svg>';"
+                    >
+                    <div class="compact-info">
+                        <div class="compact-title">{{ item.product.name }}</div>
+                        <div class="compact-qty">Qty: {{ item.quantity }} &times; {{ item.product.price|inr }}</div>
+                    </div>
+                    <div class="compact-price">{{ item.subtotal|inr }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-row">
+                <span>Items Subtotal</span>
+                <span>{{ cart.subtotal|inr }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery</span>
+                <span>{{ 'FREE' if cart.shipping == 0.0 else cart.shipping|inr }}</span>
+            </div>
+            <div class="summary-row">
+                <span>GST (5%)</span>
+                <span>{{ cart.tax|inr }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-total-row">
+                <span>Total Due</span>
+                <span class="total-price">{{ cart.total|inr }}</span>
+            </div>
+
+            <div style="margin-top: 1.25rem;">
+                <a href="{{ url_for('cart.view_cart') }}" class="btn-continue-shopping" style="font-size: 0.85rem;">
+                    &larr; Return to Shopping Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+# ==============================================================================
+# Kubernetes NodePort Service for ShopSphere
+# ==============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopsphere-service
+  labels:
+    app: shopsphere
+spec:
+  type: NodePort
+  selector:
+    app: shopsphere
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 30080
+      name: http

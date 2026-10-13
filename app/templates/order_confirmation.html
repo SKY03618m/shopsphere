@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed #{{ order.order_number }} | ShopSphere India{% endblock %}
+
+{% block content %}
+<div class="confirmation-container">
+    <!-- Success Badge & Heading -->
+    <div class="confirmation-hero">
+        <div class="success-icon-badge">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+        <h1 class="confirmation-title">Order Confirmed!</h1>
+        <p class="confirmation-subtitle">
+            Thank you for shopping with ShopSphere. Your order has been registered and securely saved in the SQLite database.
+        </p>
+        <div class="order-id-tag">
+            <span>Order Reference:</span>
+            <strong>#{{ order.order_number }}</strong>
+        </div>
+    </div>
+
+    <!-- Details Card -->
+    <div class="confirmation-card">
+        <div class="confirmation-grid">
+            <div class="confirmation-meta-item">
+                <span class="meta-label">Status</span>
+                <span class="stock-badge in-stock">
+                    <span class="pulse-dot"></span>
+                    <strong>{{ order.status }}</strong>
+                </span>
+            </div>
+
+            <div class="confirmation-meta-item">
+                <span class="meta-label">Customer Name</span>
+                <strong>{{ order.customer_name }}</strong>
+            </div>
+
+            <div class="confirmation-meta-item">
+                <span class="meta-label">Email</span>
+                <strong>{{ order.customer_email }}</strong>
+            </div>
+
+            <div class="confirmation-meta-item">
+                <span class="meta-label">Mobile Number</span>
+                <strong>{{ order.customer_phone }}</strong>
+            </div>
+
+            <div class="confirmation-meta-item full-width">
+                <span class="meta-label">Delivery Address</span>
+                <div class="address-box">{{ order.shipping_address }}</div>
+            </div>
+        </div>
+
+        <div class="summary-divider" style="margin: 1.75rem 0;"></div>
+
+        <!-- Purchased Items Breakdown -->
+        <h2 style="font-size: 1.15rem; margin-bottom: 0.85rem; color: var(--navy);">Purchased Items</h2>
+        <div class="order-items-table-wrapper">
+            <table class="receipt-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th style="text-align: right;">Unit Price</th>
+                        <th style="text-align: center;">Qty</th>
+                        <th style="text-align: right;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.product_name }}</strong>
+                        </td>
+                        <td style="text-align: right;">{{ item.unit_price|inr }}</td>
+                        <td style="text-align: center;">{{ item.quantity }}</td>
+                        <td style="text-align: right;"><strong>{{ item.subtotal|inr }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right; font-weight: 700; padding-top: 1rem;">Total Amount Paid:</td>
+                        <td style="text-align: right; font-weight: 800; font-size: 1.25rem; padding-top: 1rem; color: var(--navy);">
+                            {{ order.total_amount|inr }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="database-receipt-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            <span>Persisted in SQLite database: <code>orders</code> and <code>order_items</code> tables</span>
+        </div>
+
+        <div class="confirmation-actions">
+            <a href="{{ url_for('catalog.index') }}" class="btn-primary-large" style="text-decoration: none;">
+                Continue Shopping &rarr;
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

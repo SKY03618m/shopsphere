@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ app_name }} | Online Shopping in India{% endblock %}</title>
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- 1. Top Promotional Strip -->
+    <div class="promo-strip">
+        <div class="promo-strip-content">
+            <div class="promo-left">
+                <span>Free delivery on orders above <span class="promo-highlight">₹999</span></span>
+                <span>&bull;</span>
+                <span>Standard 2–4 day delivery across India</span>
+            </div>
+            <div class="promo-right">
+                <span>Cash on Delivery Available</span>
+                <span>&bull;</span>
+                <span>DevOps Demo Store</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Primary Navigation -->
+    <header class="header-wrapper">
+        <nav class="navbar">
+            <a href="{{ url_for('catalog.index') }}" class="brand-link" id="brand-logo-link">
+                <div class="brand-logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div style="display: flex; align-items: baseline;">
+                    <span class="brand-title">{{ app_name }}</span>
+                    <span class="brand-tag">India</span>
+                </div>
+            </a>
+
+            <!-- Practical Search Bar -->
+            <form action="{{ url_for('catalog.index') }}" method="GET" class="search-form" id="header-search-form">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input 
+                        type="text" 
+                        name="q" 
+                        id="search-input"
+                        class="search-input" 
+                        placeholder="Search for electronics, fashion, home essentials..." 
+                        value="{{ request.args.get('q', '') }}"
+                        autocomplete="off"
+                    >
+                    {% if request.args.get('q') %}
+                    <a href="{{ url_for('catalog.index') }}" class="search-clear-btn" title="Clear search">&times;</a>
+                    {% endif %}
+                </div>
+            </form>
+
+            <div class="nav-actions">
+                <a href="{{ url_for('catalog.index') }}" class="nav-link-store" id="nav-catalog-link">
+                    Store
+                </a>
+
+                <a href="{{ url_for('cart.view_cart') }}" class="cart-button" id="cart-nav-btn">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span>My Cart</span>
+                    <span class="cart-badge" id="cart-item-count">{{ cart_count }}</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 3. Category Sub-Navigation Bar -->
+    <nav class="category-subnav">
+        <div class="category-subnav-inner">
+            <a href="{{ url_for('catalog.index') }}" class="cat-nav-item {% if not request.args.get('category') and not request.args.get('q') %}active{% endif %}">
+                All Categories
+            </a>
+            <a href="{{ url_for('catalog.index', category='electronics') }}" class="cat-nav-item {% if request.args.get('category') == 'electronics' %}active{% endif %}">
+                Electronics
+            </a>
+            <a href="{{ url_for('catalog.index', category='fashion') }}" class="cat-nav-item {% if request.args.get('category') == 'fashion' %}active{% endif %}">
+                Fashion
+            </a>
+            <a href="{{ url_for('catalog.index', category='home-kitchen') }}" class="cat-nav-item {% if request.args.get('category') == 'home-kitchen' %}active{% endif %}">
+                Home &amp; Kitchen
+            </a>
+            <a href="{{ url_for('catalog.index', category='books-tech') }}" class="cat-nav-item {% if request.args.get('category') == 'books-tech' %}active{% endif %}">
+                Books &amp; Tech
+            </a>
+        </div>
+    </nav>
+
+    <!-- Flash Messages Container -->
+    <div class="alerts-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    <span>{{ message }}</span>
+                    <button type="button" class="alert-close" onclick="this.parentElement.remove();">&times;</button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-row">
+                <div class="footer-brand">{{ app_name }} &bull; Distributed Commerce Platform</div>
+                <div class="footer-tags">
+                    <span class="footer-tag">Python Flask</span>
+                    <span class="footer-tag">SQLite3</span>
+                    <span class="footer-tag">Docker</span>
+                    <span class="footer-tag">Jenkins</span>
+                    <span class="footer-tag">Kubernetes</span>
+                </div>
+            </div>
+            <div class="footer-credit">
+                ShopSphere Retail Demo &bull; Designed &amp; Engineered for College DevOps Project Submission
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
